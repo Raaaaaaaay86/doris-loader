@@ -26,6 +26,7 @@ type StreamLoader struct {
 	LoadFormat loadformat.Enum // Data format of loaded file (default: InlineJson)
 }
 
+// NewStreamLoader creates a new stream loader.
 func NewStreamLoader(
 	feNodes []string,
 	database string,
@@ -66,6 +67,28 @@ func NewStreamLoader(
 	return &loader, nil
 }
 
+// LoadFile stream loads a file to Doris.
+//	
+//	loader, err := loader.NewStreamLoader(
+//		[]string{"127.0.0.1:8030"},
+//		"db_name",
+//		"table_name",
+//		WithUsername("root"),
+//		WithPassword("changeme"),
+//	)
+//	if err != nil {
+//		return err
+//	}
+//	
+//	// Return stream load result
+//	result, err := loader.LoadFile(context.TODO(), "path/to/file")
+//	if err != nil {
+//		return err
+//	}
+//	
+//	if result.IsSuccess() {
+//		// Do something for fail result...
+//	}
 func (s StreamLoader) LoadFile(
 	ctx context.Context,
 	filename string,
@@ -88,6 +111,7 @@ func (s StreamLoader) LoadFile(
 	return result, nil
 }
 
+// checkRequiredFields checks if required fields are set.
 func (s StreamLoader) checkRequiredFields() error {
 	if len(s.FeNodes) == 0 {
 		return fmt.Errorf("frontend nodes are required")
@@ -104,6 +128,7 @@ func (s StreamLoader) checkRequiredFields() error {
 	return nil
 }
 
+// buildRequest builds a http request for stream load.
 func (s StreamLoader) buildRequest(payload io.Reader) (*http.Request, error) {
 	url := fmt.Sprintf(
 		"%s://%s/api/%s/%s/_stream_load",
@@ -132,6 +157,7 @@ func (s StreamLoader) buildRequest(payload io.Reader) (*http.Request, error) {
 	return req, nil
 }
 
+// doRequest sends a stream load http request.
 func (s StreamLoader) doRequest(req *http.Request) (*StreamLoadResult, error) {
 	client := &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {

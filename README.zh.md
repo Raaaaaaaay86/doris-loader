@@ -3,8 +3,8 @@
 [![en](https://img.shields.io/badge/lang-en-blue)](https://github.com/raaaaaaaay86/doris-loader/blob/main/README.md)
 [![zh](https://img.shields.io/badge/lang-zh-blue)](https://github.com/raaaaaaaay86/doris-loader/blob/main/README.zh.md)
 
-[!NOTE]
-此Package仍在開發中，尚未準備好用於生產環境。
+> [!NOTE]
+> 此Package仍在開發中，尚未準備好用於生產環境。
 
 # 關於
 

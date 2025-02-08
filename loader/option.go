@@ -11,6 +11,7 @@ import (
 
 type StreamLoaderOption func(*StreamLoader) error
 
+// WithLoadFormat sets the data format of the loaded file. It'll return an error if there has any value set before or provided an unexpected loadformat.Enum.
 func WithLoadFormat(format loadformat.Enum) StreamLoaderOption {
 	return func(loader *StreamLoader) error {
 		if !enum.IsZero(loader.LoadFormat) {
@@ -35,6 +36,7 @@ func WithLoadFormat(format loadformat.Enum) StreamLoaderOption {
 	}
 }
 
+// WithProtocol sets the stream load protocol to determince using HTTP or HTTPS. It'll return an error if there has any value set before or provided an unexpected protocol.Enum.
 func WithProtocol(p protocol.Enum) StreamLoaderOption {
 	return func(loader *StreamLoader) error {
 		if !enum.IsZero(loader.Protocol) {
@@ -56,6 +58,7 @@ func WithProtocol(p protocol.Enum) StreamLoaderOption {
 	}
 }
 
+// WithHeader sets the stream load header. It'll set whole header if there has no header set before. Otherwise, it'll merge the provided header with the existing header.
 func WithHeader(m map[string]any) StreamLoaderOption {
 	return func(loader *StreamLoader) error {
 		if loader.Header == nil {
@@ -71,6 +74,7 @@ func WithHeader(m map[string]any) StreamLoaderOption {
 	}
 }
 
+// WithUsername sets the username for authentication. It'll return an error if there has any username set before.
 func WithUsername(username string) StreamLoaderOption {
 	return func(loader *StreamLoader) error {
 		if loader.Username != "" {
@@ -83,6 +87,7 @@ func WithUsername(username string) StreamLoaderOption {
 	}
 }
 
+// WithPassword sets the password for authentication. It'll return an error if there has any password set before.
 func WithPassword(password string) StreamLoaderOption {
 	return func(loader *StreamLoader) error {
 		if loader.Password != "" {

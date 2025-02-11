@@ -43,7 +43,7 @@ func WithProtocol(p protocol.Enum) StreamLoaderOption {
 			return fmt.Errorf("ambiguous protocol. are you going to use %s or %s?", loader.Protocol, p)
 		}
 
-		switch loader.Protocol {
+		switch p {
 		case protocol.Http, protocol.Https:
 			loader.Protocol = p
 		default:

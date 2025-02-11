@@ -252,10 +252,10 @@ func TestNewStreamLoader(t *testing.T) {
 func TestStreamLoad(t *testing.T) {
 	t.Log("stream load a file to Doris")
 
-	feNodes := "127.0.0.1:8030,localhost:8030"
-	beNodes := "127.0.0.1:8040"
-	username := "root"
-	password := ""
+	feNodes := os.Getenv("FE_NODES")
+	beNodes := os.Getenv("BE_NODES")
+	username := os.Getenv("USERNAME")
+	password := os.Getenv("PASSWORD")
 
 	ld, err := loader.NewStreamLoader(
 		strings.Split(feNodes, ","),

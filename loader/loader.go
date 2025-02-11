@@ -53,11 +53,15 @@ func NewStreamLoader(
 	}
 
 	if enum.IsZero(loader.LoadFormat) {
-		loader.LoadFormat = loadformat.InlineJson
+		if err := WithLoadFormat(loadformat.InlineJson)(&loader); err != nil {
+			return &loader, err
+		}
 	}
 
 	if enum.IsZero(loader.Protocol) {
-		loader.Protocol = protocol.Http
+		if err := WithProtocol(protocol.Http)(&loader); err != nil {
+			return &loader, err
+		}
 	}
 
 	return &loader, nil
@@ -157,13 +161,17 @@ func (s StreamLoader) buildRequest(payload io.Reader) (*http.Request, error) {
 func (s StreamLoader) doRequest(req *http.Request) (*StreamLoadResult, error) {
 	client := &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			if len(s.BeNodes) == 0 {
+				return nil
+			}
+
 			redirectTo, _ := url.Parse(
 				fmt.Sprintf(
 					"%s://%s:%s@%s/api/%s/%s/_stream_load",
 					s.Protocol,
 					s.Username,
 					s.Password,
-					s.FeNodes[0],
+					s.BeNodes[0],
 					s.Database,
 					s.Table,
 				),

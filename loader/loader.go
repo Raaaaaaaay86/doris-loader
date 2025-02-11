@@ -11,7 +11,7 @@ import (
 
 	"github.com/raaaaaaaay86/doris-loader/enum"
 	"github.com/raaaaaaaay86/doris-loader/enum/loadformat"
-	protocol "github.com/raaaaaaaay86/doris-loader/enum/protocol"
+	"github.com/raaaaaaaay86/doris-loader/enum/protocol"
 )
 
 type StreamLoader struct {

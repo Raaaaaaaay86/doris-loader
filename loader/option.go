@@ -14,7 +14,7 @@ type StreamLoaderOption func(*StreamLoader) error
 // WithLoadFormat sets the data format of the loaded file. It'll return an error if there has any value set before or provided an unexpected loadformat.Enum.
 func WithLoadFormat(format loadformat.Enum) StreamLoaderOption {
 	return func(loader *StreamLoader) error {
-		if !enum.IsZero(loader.LoadFormat) {
+		if !enum.IsZero(loader.LoadFormat) && loader.LoadFormat != format {
 			return fmt.Errorf("ambiguous load format. are you going to use %s or %s?", loader.LoadFormat, format)
 		}
 
@@ -39,7 +39,7 @@ func WithLoadFormat(format loadformat.Enum) StreamLoaderOption {
 // WithProtocol sets the stream load protocol to determince using HTTP or HTTPS. It'll return an error if there has any value set before or provided an unexpected protocol.Enum.
 func WithProtocol(p protocol.Enum) StreamLoaderOption {
 	return func(loader *StreamLoader) error {
-		if !enum.IsZero(loader.Protocol) {
+		if !enum.IsZero(loader.Protocol) && loader.Protocol != p {
 			return fmt.Errorf("ambiguous protocol. are you going to use %s or %s?", loader.Protocol, p)
 		}
 
@@ -77,7 +77,7 @@ func WithHeader(m map[string]any) StreamLoaderOption {
 // WithUsername sets the username for authentication. It'll return an error if there has any username set before.
 func WithUsername(username string) StreamLoaderOption {
 	return func(loader *StreamLoader) error {
-		if loader.Username != "" {
+		if loader.Username != "" && loader.Username != username {
 			return fmt.Errorf("ambiguous username. are you going to use %s or %s?", loader.Username, username)
 		}
 
@@ -90,7 +90,7 @@ func WithUsername(username string) StreamLoaderOption {
 // WithPassword sets the password for authentication. It'll return an error if there has any password set before.
 func WithPassword(password string) StreamLoaderOption {
 	return func(loader *StreamLoader) error {
-		if loader.Password != "" {
+		if loader.Password != "" && loader.Password != password{
 			return fmt.Errorf("ambiguous password. there is already a password set")
 		}
 

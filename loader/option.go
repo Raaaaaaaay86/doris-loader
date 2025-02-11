@@ -99,3 +99,16 @@ func WithPassword(password string) StreamLoaderOption {
 		return nil
 	}
 }
+
+// WithBeNodes sets the backend nodes for stream load. It'll return an error if there has any backend nodes set before.
+func WithBeNodes(beNodes []string) StreamLoaderOption {
+	return func(loader *StreamLoader) error {
+		if len(loader.BeNodes) != 0 {
+			return fmt.Errorf("ambiguous backend nodes. there is already a list of backend nodes set")
+		}
+
+		loader.BeNodes = beNodes
+
+		return nil
+	}
+}

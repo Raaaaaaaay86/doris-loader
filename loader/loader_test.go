@@ -14,21 +14,21 @@ import (
 
 func TestNewStreamLoader(t *testing.T) {
 	type testcase struct {
-		FeNodes     []string
-		Database    string
-		Table       string
-		Options     []loader.StreamLoaderOption
-		ExpectFunc  func(testcase, *loader.StreamLoader, error)
+		FeNodes         []string
+		Database        string
+		Table           string
+		Options         []loader.StreamLoaderOption
+		ExpectFunc      func(testcase, *loader.StreamLoader, error)
 		TestDescription string
 	}
 
 	testcases := []testcase{
 		{
 			TestDescription: "only pass required fields and without any options. The constructed loader should have set default value on optional fields",
-			FeNodes:  []string{"127.0.0.1:8030"},
-			Database: "my_database",
-			Table:    "my_table",
-			Options:  []loader.StreamLoaderOption{},
+			FeNodes:         []string{"127.0.0.1:8030"},
+			Database:        "my_database",
+			Table:           "my_table",
+			Options:         []loader.StreamLoaderOption{},
 			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
 				assert.NoError(t, err)
 				assert.NotNil(t, ld)
@@ -52,9 +52,9 @@ func TestNewStreamLoader(t *testing.T) {
 		},
 		{
 			TestDescription: "pass all fields and options. The constructed loader should have set value on all fields",
-			FeNodes:  []string{"127.0.0.1:8030"},
-			Database: "my_database",
-			Table:    "my_table",
+			FeNodes:         []string{"127.0.0.1:8030"},
+			Database:        "my_database",
+			Table:           "my_table",
 			Options: []loader.StreamLoaderOption{
 				loader.WithLoadFormat(loadformat.InlineJson),
 				loader.WithProtocol(protocol.Https),
@@ -89,10 +89,10 @@ func TestNewStreamLoader(t *testing.T) {
 		},
 		{
 			TestDescription: "pass empty list of FeNodes. The constructor should return error",
-			FeNodes:  []string{},
-			Database: "my_database",
-			Table:    "my_table",
-			Options:  []loader.StreamLoaderOption{},
+			FeNodes:         []string{},
+			Database:        "my_database",
+			Table:           "my_table",
+			Options:         []loader.StreamLoaderOption{},
 			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
 				assert.Error(t, err)
 				assert.NotNil(t, ld)
@@ -101,10 +101,10 @@ func TestNewStreamLoader(t *testing.T) {
 		},
 		{
 			TestDescription: "pass empty database. The constructor should return error",
-			FeNodes:  []string{"127.0.0.1:8030"},
-			Database: "",
-			Table:    "my_table",
-			Options:  []loader.StreamLoaderOption{},
+			FeNodes:         []string{"127.0.0.1:8030"},
+			Database:        "",
+			Table:           "my_table",
+			Options:         []loader.StreamLoaderOption{},
 			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
 				assert.Error(t, err)
 				assert.NotNil(t, ld)
@@ -113,10 +113,10 @@ func TestNewStreamLoader(t *testing.T) {
 		},
 		{
 			TestDescription: "pass empty table. The constructor should return error",
-			FeNodes:  []string{"127.0.0.1:8030"},
-			Database: "my_database",
-			Table:    "",
-			Options:  []loader.StreamLoaderOption{},
+			FeNodes:         []string{"127.0.0.1:8030"},
+			Database:        "my_database",
+			Table:           "",
+			Options:         []loader.StreamLoaderOption{},
 			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
 				assert.Error(t, err)
 				assert.NotNil(t, ld)
@@ -125,10 +125,10 @@ func TestNewStreamLoader(t *testing.T) {
 		},
 		{
 			TestDescription: "should prevent ambiguous username option",
-			FeNodes:  []string{"127.0.0.1:8030"},
-			Database: "my_database",
-			Table:    "my_table",
-			Options:  []loader.StreamLoaderOption{
+			FeNodes:         []string{"127.0.0.1:8030"},
+			Database:        "my_database",
+			Table:           "my_table",
+			Options: []loader.StreamLoaderOption{
 				loader.WithUsername("my_username"),
 				loader.WithUsername("my_another_username"),
 			},
@@ -140,10 +140,10 @@ func TestNewStreamLoader(t *testing.T) {
 		},
 		{
 			TestDescription: "should prevent ambiguous password option",
-			FeNodes:  []string{"127.0.0.1:8030"},
-			Database: "my_database",
-			Table:    "my_table",
-			Options:  []loader.StreamLoaderOption{
+			FeNodes:         []string{"127.0.0.1:8030"},
+			Database:        "my_database",
+			Table:           "my_table",
+			Options: []loader.StreamLoaderOption{
 				loader.WithPassword("my_password"),
 				loader.WithPassword("my_another_password"),
 			},
@@ -155,10 +155,10 @@ func TestNewStreamLoader(t *testing.T) {
 		},
 		{
 			TestDescription: "should prevent ambiguous protocol option",
-			FeNodes:  []string{"127.0.0.1:8030"},
-			Database: "my_database",
-			Table:    "my_table",
-			Options:  []loader.StreamLoaderOption{
+			FeNodes:         []string{"127.0.0.1:8030"},
+			Database:        "my_database",
+			Table:           "my_table",
+			Options: []loader.StreamLoaderOption{
 				loader.WithProtocol(protocol.Http),
 				loader.WithProtocol(protocol.Https),
 			},
@@ -170,10 +170,10 @@ func TestNewStreamLoader(t *testing.T) {
 		},
 		{
 			TestDescription: "should prevent ambiguous load format option",
-			FeNodes:  []string{"127.0.0.1:8030"},
-			Database: "my_database",
-			Table:    "my_table",
-			Options:  []loader.StreamLoaderOption{
+			FeNodes:         []string{"127.0.0.1:8030"},
+			Database:        "my_database",
+			Table:           "my_table",
+			Options: []loader.StreamLoaderOption{
 				loader.WithLoadFormat(loadformat.InlineJson),
 				loader.WithLoadFormat(loadformat.Csv),
 			},
@@ -185,10 +185,10 @@ func TestNewStreamLoader(t *testing.T) {
 		},
 		{
 			TestDescription: "should prevent empty protocol option",
-			FeNodes:  []string{"127.0.0.1:8030"},
-			Database: "my_database",
-			Table:    "my_table",
-			Options:  []loader.StreamLoaderOption{
+			FeNodes:         []string{"127.0.0.1:8030"},
+			Database:        "my_database",
+			Table:           "my_table",
+			Options: []loader.StreamLoaderOption{
 				loader.WithProtocol(protocol.Enum("")),
 			},
 			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
@@ -199,10 +199,10 @@ func TestNewStreamLoader(t *testing.T) {
 		},
 		{
 			TestDescription: "should prevent empty load format option",
-			FeNodes:  []string{"127.0.0.1:8030"},
-			Database: "my_database",
-			Table:    "my_table",
-			Options:  []loader.StreamLoaderOption{
+			FeNodes:         []string{"127.0.0.1:8030"},
+			Database:        "my_database",
+			Table:           "my_table",
+			Options: []loader.StreamLoaderOption{
 				loader.WithLoadFormat(loadformat.Enum("")),
 			},
 			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
@@ -213,10 +213,10 @@ func TestNewStreamLoader(t *testing.T) {
 		},
 		{
 			TestDescription: "should indicate unsupported protocol option",
-			FeNodes:  []string{"127.0.0.1:8030"},
-			Database: "my_database",
-			Table:    "my_table",
-			Options:  []loader.StreamLoaderOption{
+			FeNodes:         []string{"127.0.0.1:8030"},
+			Database:        "my_database",
+			Table:           "my_table",
+			Options: []loader.StreamLoaderOption{
 				loader.WithProtocol(protocol.Enum("invalid_protocol")),
 			},
 			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
@@ -227,10 +227,10 @@ func TestNewStreamLoader(t *testing.T) {
 		},
 		{
 			TestDescription: "should indicate unsupported load format option",
-			FeNodes:  []string{"127.0.0.1:8030"},
-			Database: "my_database",
-			Table:    "my_table",
-			Options:  []loader.StreamLoaderOption{
+			FeNodes:         []string{"127.0.0.1:8030"},
+			Database:        "my_database",
+			Table:           "my_table",
+			Options: []loader.StreamLoaderOption{
 				loader.WithLoadFormat(loadformat.Csv),
 			},
 			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {

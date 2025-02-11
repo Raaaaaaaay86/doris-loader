@@ -1,6 +1,9 @@
 package loader_test
 
 import (
+	"context"
+	"os"
+	"strings"
 	"testing"
 
 	"github.com/raaaaaaaay86/doris-loader/enum/loadformat"
@@ -243,5 +246,54 @@ func TestNewStreamLoader(t *testing.T) {
 
 		ld, err := loader.NewStreamLoader(tc.FeNodes, tc.Database, tc.Table, tc.Options...)
 		tc.ExpectFunc(tc, ld, err)
+	}
+}
+
+func TestStreamLoad(t *testing.T) {
+	t.Log("stream load a file to Doris")
+
+	feNodes := "127.0.0.1:8030,localhost:8030"
+	beNodes := "127.0.0.1:8040"
+	username := "root"
+	password := ""
+
+	ld, err := loader.NewStreamLoader(
+		strings.Split(feNodes, ","),
+		"my_db",
+		"users",
+		loader.WithBeNodes(strings.Split(beNodes, ",")),
+		loader.WithUsername(username),
+		loader.WithPassword(password),
+	)
+	if err != nil {
+		t.Failed()
+		return
+	}
+
+	temp, err := os.CreateTemp("", "test_stream_load_*")
+	if err != nil {
+		t.Failed()
+		return
+	}
+	defer os.Remove(temp.Name())
+	defer temp.Close()
+
+	lines := []string{
+		`{"name": "John Doe", "age": 30}`,
+	}
+	for _, line := range lines {
+		_, err = temp.WriteString(line + "\n")
+		if err != nil {
+			t.Failed()
+			return
+		}
+	}
+
+	result, err := ld.LoadFile(context.Background(), temp.Name())
+
+	assert.NoError(t, err)
+	if !result.IsSuccess() {
+		assert.True(t, result.IsSuccess())
+		t.Logf("error_url=%s message=%s", result.ErrorURL, result.Message)
 	}
 }

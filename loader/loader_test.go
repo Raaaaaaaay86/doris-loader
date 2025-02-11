@@ -266,13 +266,13 @@ func TestStreamLoad(t *testing.T) {
 		loader.WithPassword(password),
 	)
 	if err != nil {
-		t.Failed()
+		t.FailNow()
 		return
 	}
 
 	temp, err := os.CreateTemp("", "test_stream_load_*")
 	if err != nil {
-		t.Failed()
+		t.FailNow()
 		return
 	}
 	defer os.Remove(temp.Name())
@@ -284,16 +284,20 @@ func TestStreamLoad(t *testing.T) {
 	for _, line := range lines {
 		_, err = temp.WriteString(line + "\n")
 		if err != nil {
-			t.Failed()
+			t.FailNow()
 			return
 		}
 	}
 
 	result, err := ld.LoadFile(context.Background(), temp.Name())
+	if err != nil {
+		t.Logf("stream load error: %s", err.Error())
+		t.FailNow()
+		return
+	}
 
-	assert.NoError(t, err)
 	if !result.IsSuccess() {
-		assert.True(t, result.IsSuccess())
 		t.Logf("error_url=%s message=%s", result.ErrorURL, result.Message)
+		assert.True(t, result.IsSuccess())
 	}
 }

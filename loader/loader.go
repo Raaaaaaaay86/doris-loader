@@ -53,15 +53,11 @@ func NewStreamLoader(
 	}
 
 	if enum.IsZero(loader.LoadFormat) {
-		if err := WithLoadFormat(loadformat.InlineJson)(&loader); err != nil {
-			return &loader, err
-		}
+		loader.LoadFormat = loadformat.InlineJson
 	}
 
 	if enum.IsZero(loader.Protocol) {
-		if err := WithProtocol(protocol.Http)(&loader); err != nil {
-			return &loader, err
-		}
+		loader.Protocol = protocol.Http
 	}
 
 	return &loader, nil

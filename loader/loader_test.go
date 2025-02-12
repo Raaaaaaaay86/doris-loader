@@ -137,7 +137,7 @@ func TestNewStreamLoader(t *testing.T) {
 			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
 				assert.Error(t, err)
 				assert.NotNil(t, ld)
-				assert.EqualError(t, err, "ambiguous username. are you going to use my_username or my_another_username?")
+				assert.EqualError(t, err, loader.ErrAmbiguousOption("username").Error())
 			},
 		},
 		{
@@ -152,7 +152,7 @@ func TestNewStreamLoader(t *testing.T) {
 			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
 				assert.Error(t, err)
 				assert.NotNil(t, ld)
-				assert.EqualError(t, err, "ambiguous password. there is already a password set")
+				assert.EqualError(t, err, loader.ErrAmbiguousOption("Password").Error())
 			},
 		},
 		{
@@ -167,7 +167,7 @@ func TestNewStreamLoader(t *testing.T) {
 			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
 				assert.Error(t, err)
 				assert.NotNil(t, ld)
-				assert.EqualError(t, err, "ambiguous protocol. are you going to use http or https?")
+				assert.EqualError(t, err, loader.ErrAmbiguousOption("Protocol").Error())
 			},
 		},
 		{
@@ -182,7 +182,7 @@ func TestNewStreamLoader(t *testing.T) {
 			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
 				assert.Error(t, err)
 				assert.NotNil(t, ld)
-				assert.EqualError(t, err, "ambiguous load format. are you going to use inline_json or csv?")
+				assert.EqualError(t, err, loader.ErrAmbiguousOption("LoadFormat").Error())
 			},
 		},
 		{
@@ -197,7 +197,7 @@ func TestNewStreamLoader(t *testing.T) {
 			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
 				assert.Error(t, err)
 				assert.NotNil(t, ld)
-				assert.EqualError(t, err, "ambiguous columns. There has columns already set")
+				assert.EqualError(t, err, loader.ErrAmbiguousOption("Columns").Error())
 			},
 		},
 		{
@@ -212,7 +212,7 @@ func TestNewStreamLoader(t *testing.T) {
 			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
 				assert.Error(t, err)
 				assert.NotNil(t, ld)
-				assert.EqualError(t, err, "ambiguous backend nodes. there has already backend nodes set")
+				assert.EqualError(t, err, loader.ErrAmbiguousOption("BeNodes").Error())
 			},
 		},
 		{
@@ -227,7 +227,7 @@ func TestNewStreamLoader(t *testing.T) {
 			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
 				assert.Error(t, err)
 				assert.NotNil(t, ld)
-				assert.EqualError(t, err, "ambiguous max retry. there is already a max retry set")
+				assert.EqualError(t, err, loader.ErrAmbiguousOption("MaxRetry").Error())
 			},
 		},
 		{
@@ -258,7 +258,7 @@ func TestNewStreamLoader(t *testing.T) {
 			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
 				assert.Error(t, err)
 				assert.NotNil(t, ld)
-				assert.EqualError(t, err, "ambiguous retry interval. there is already a retry interval set")
+				assert.EqualError(t, err, loader.ErrAmbiguousOption("RetryInterval").Error())
 			},
 		},
 		{
@@ -288,7 +288,7 @@ func TestNewStreamLoader(t *testing.T) {
 			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
 				assert.Error(t, err)
 				assert.NotNil(t, ld)
-				assert.EqualError(t, err, "provided protocol is zero value")
+				assert.EqualError(t, err, loader.ErrZeroValueOption("Protocol").Error())
 			},
 		},
 		{
@@ -302,7 +302,7 @@ func TestNewStreamLoader(t *testing.T) {
 			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
 				assert.Error(t, err)
 				assert.NotNil(t, ld)
-				assert.EqualError(t, err, "provided load format is zero value")
+				assert.EqualError(t, err, loader.ErrZeroValueOption("LoadFormat").Error())
 			},
 		},
 		{
@@ -316,7 +316,7 @@ func TestNewStreamLoader(t *testing.T) {
 			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
 				assert.Error(t, err)
 				assert.NotNil(t, ld)
-				assert.EqualError(t, err, "unsupported protocol: invalid_protocol")
+				assert.EqualError(t, err, loader.ErrZeroValueOption("Protocol").Error())
 			},
 		},
 		{
@@ -330,7 +330,7 @@ func TestNewStreamLoader(t *testing.T) {
 			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
 				assert.Error(t, err)
 				assert.NotNil(t, ld)
-				assert.EqualError(t, err, "unsupported load format: invalid_load_format")
+				assert.EqualError(t, err, loader.ErrUnsupportedValue("invalid_load_format").Error())
 			},
 		},
 	}

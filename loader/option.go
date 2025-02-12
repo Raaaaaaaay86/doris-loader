@@ -1,8 +1,6 @@
 package loader
 
 import (
-	"errors"
-	"fmt"
 	"strings"
 	"time"
 
@@ -18,7 +16,7 @@ type StreamLoaderOption func(*StreamLoader) error
 func WithLoadFormat(format loadformat.Enum) StreamLoaderOption {
 	return func(loader *StreamLoader) error {
 		if !enum.IsZero(loader.LoadFormat) && loader.LoadFormat != format {
-			return fmt.Errorf("ambiguous load format. are you going to use %s or %s?", loader.LoadFormat, format)
+			return ErrAmbiguousOption("LoadFormat")
 		}
 
 		loader.LoadFormat = format
@@ -35,10 +33,10 @@ func WithLoadFormat(format loadformat.Enum) StreamLoaderOption {
 			loader.Header["column_separator"] = ","
 		default:
 			if enum.IsZero(format) {
-				return fmt.Errorf("provided load format is zero value")
+				return ErrZeroValueOption("LoadFormat")
 			}
 
-			return fmt.Errorf("unsupported load format: %s", format)
+			return ErrUnsupportedValue(format)
 		}
 
 		return nil
@@ -49,7 +47,7 @@ func WithLoadFormat(format loadformat.Enum) StreamLoaderOption {
 func WithProtocol(p protocol.Enum) StreamLoaderOption {
 	return func(loader *StreamLoader) error {
 		if !enum.IsZero(loader.Protocol) && loader.Protocol != p {
-			return fmt.Errorf("ambiguous protocol. are you going to use %s or %s?", loader.Protocol, p)
+			return ErrAmbiguousOption("Protocol")
 		}
 
 		switch p {
@@ -57,10 +55,10 @@ func WithProtocol(p protocol.Enum) StreamLoaderOption {
 			loader.Protocol = p
 		default:
 			if enum.IsZero(p) {
-				return fmt.Errorf("provided protocol is zero value")
+				return ErrZeroValueOption("Protocol")
 			}
 
-			return fmt.Errorf("unsupported protocol: %s", p)
+			return ErrUnsupportedValue(p)
 		}
 
 		return nil
@@ -87,7 +85,7 @@ func WithHeader(m map[string]any) StreamLoaderOption {
 func WithUsername(username string) StreamLoaderOption {
 	return func(loader *StreamLoader) error {
 		if loader.Username != "" && loader.Username != username {
-			return fmt.Errorf("ambiguous username. are you going to use %s or %s?", loader.Username, username)
+			return ErrAmbiguousOption("Username")
 		}
 
 		loader.Username = username
@@ -100,7 +98,7 @@ func WithUsername(username string) StreamLoaderOption {
 func WithPassword(password string) StreamLoaderOption {
 	return func(loader *StreamLoader) error {
 		if loader.Password != "" && loader.Password != password{
-			return fmt.Errorf("ambiguous password. there is already a password set")
+			return ErrAmbiguousOption("Password")
 		}
 
 		loader.Password = password
@@ -113,7 +111,7 @@ func WithPassword(password string) StreamLoaderOption {
 func WithBeNodes(beNodes []string) StreamLoaderOption {
 	return func(loader *StreamLoader) error {
 		if len(loader.BeNodes) != 0 {
-			return fmt.Errorf("ambiguous backend nodes. there has already backend nodes set")
+			return ErrAmbiguousOption("BeNodes")
 		}
 
 		loader.BeNodes = beNodes
@@ -126,7 +124,7 @@ func WithBeNodes(beNodes []string) StreamLoaderOption {
 func WithColumns(columns []string) StreamLoaderOption {
 	return func(loader *StreamLoader) error {
 		if _, ok := loader.Header["columns"]; ok {
-			return fmt.Errorf("ambiguous columns. There has columns already set")
+			return ErrAmbiguousOption("Columns")
 		}
 
 		loader.Header["columns"] = strings.Join(columns, ",")
@@ -139,7 +137,7 @@ func WithColumns(columns []string) StreamLoaderOption {
 func WithMaxRetry(retry int) StreamLoaderOption {
 	return func(loader *StreamLoader) error {
 		if loader.MaxRetry != 3 && loader.MaxRetry != retry { // 3 is the default value
-			return fmt.Errorf("ambiguous max retry. there is already a max retry set")
+			return ErrAmbiguousOption("MaxRetry")
 		}
 
 		loader.MaxRetry = retry
@@ -152,7 +150,7 @@ func WithMaxRetry(retry int) StreamLoaderOption {
 func WithRetryInterval(interval time.Duration) StreamLoaderOption {
 	return func(loader *StreamLoader) error {
 		if loader.RetryInterval != 1*time.Second { // 1 second is the default value
-			return errors.New("ambiguous retry interval. there is already a retry interval set")
+			return ErrAmbiguousOption("RetryInterval")
 		}
 
 		loader.RetryInterval = interval

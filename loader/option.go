@@ -3,6 +3,7 @@ package loader
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/raaaaaaaay86/doris-loader/enum"
 	"github.com/raaaaaaaay86/doris-loader/enum/loadformat"
@@ -128,6 +129,32 @@ func WithColumns(columns []string) StreamLoaderOption {
 		}
 
 		loader.Header["columns"] = strings.Join(columns, ",")
+
+		return nil
+	}
+}
+
+// WithMaxRetry sets the maximum retry count for stream load. It'll return an error if there has any max retry set before.
+func WithMaxRetry(retry int) StreamLoaderOption {
+	return func(loader *StreamLoader) error {
+		if loader.MaxRetry != 3 { // 3 is the default value
+			return fmt.Errorf("ambiguous max retry. there is already a max retry set")
+		}
+
+		loader.MaxRetry = retry
+
+		return nil
+	}
+}
+
+// WithRetryInterval sets the retry interval for stream load. It'll return an error if there has any retry interval set before.
+func WithRetryInterval(interval time.Duration) StreamLoaderOption {
+	return func(loader *StreamLoader) error {
+		if loader.RetryInterval != 1*time.Second { // 1 second is the default value
+			return fmt.Errorf("ambiguous retry interval. there is already a retry interval set")
+		}
+
+		loader.RetryInterval = interval
 
 		return nil
 	}

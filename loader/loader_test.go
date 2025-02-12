@@ -2,6 +2,7 @@ package loader_test
 
 import (
 	"context"
+	"encoding/json"
 	"os"
 	"strings"
 	"testing"
@@ -184,6 +185,21 @@ func TestNewStreamLoader(t *testing.T) {
 			},
 		},
 		{
+			TestDescription: "should prevent ambiguous load format option",
+			FeNodes:         []string{"127.0.0.1:8030"},
+			Database:        "my_database",
+			Table:           "my_table",
+			Options: []loader.StreamLoaderOption{
+				loader.WithColumns([]string{"column_a", "column_b"}),
+				loader.WithColumns([]string{"column_a", "column_b"}),
+			},
+			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
+				assert.Error(t, err)
+				assert.NotNil(t, ld)
+				assert.EqualError(t, err, "ambiguous columns. There has columns already set")
+			},
+		},
+		{
 			TestDescription: "should prevent empty protocol option",
 			FeNodes:         []string{"127.0.0.1:8030"},
 			Database:        "my_database",
@@ -231,12 +247,12 @@ func TestNewStreamLoader(t *testing.T) {
 			Database:        "my_database",
 			Table:           "my_table",
 			Options: []loader.StreamLoaderOption{
-				loader.WithLoadFormat(loadformat.Csv),
+				loader.WithLoadFormat(loadformat.Enum("invalid_load_format")),
 			},
 			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
 				assert.Error(t, err)
 				assert.NotNil(t, ld)
-				assert.EqualError(t, err, "unsupported load format: csv")
+				assert.EqualError(t, err, "unsupported load format: invalid_load_format")
 			},
 		},
 	}
@@ -300,4 +316,119 @@ func TestStreamLoad(t *testing.T) {
 		t.Logf("error_url=%s message=%s", result.ErrorURL, result.Message)
 		assert.True(t, result.IsSuccess())
 	}
+}
+
+func TestStreamLoadWithCsvLoadFormat(t *testing.T) {
+	t.Log("stream load a csv file to Doris")
+
+	feNodes := os.Getenv("FE_NODES")
+	beNodes := os.Getenv("BE_NODES")
+	username := os.Getenv("USERNAME")
+	password := os.Getenv("PASSWORD")
+
+	ld, err := loader.NewStreamLoader(
+		strings.Split(feNodes, ","),
+		"my_db",
+		"users",
+		loader.WithBeNodes(strings.Split(beNodes, ",")),
+		loader.WithUsername(username),
+		loader.WithPassword(password),
+		loader.WithLoadFormat(loadformat.Csv),
+		loader.WithColumns([]string{"name", "age"}),
+	)
+	if err != nil {
+		t.FailNow()
+		return
+	}
+
+	temp, err := os.CreateTemp("", "test_stream_load_csv_*")
+	if err != nil {
+		t.FailNow()
+		return
+	}
+	defer os.Remove(temp.Name())
+	defer temp.Close()
+
+	lines := []string{
+		`Jenny Chang,50`,
+	}
+	for _, line := range lines {
+		_, err = temp.WriteString(line + "\n")
+		if err != nil {
+			t.FailNow()
+			return
+		}
+	}
+
+	result, err := ld.LoadFile(context.Background(), temp.Name())
+	if err != nil {
+		t.Logf("stream load error: %s", err.Error())
+		t.FailNow()
+		return
+	}
+
+	if !result.IsSuccess() {
+		t.Logf("error_url=%s message=%s", result.ErrorURL, result.Message)
+		assert.True(t, result.IsSuccess())
+	}
+
+	resultStr, _ := json.MarshalIndent(result, "", "  ")
+	t.Log(string(resultStr))
+}
+func TestStreamLoadWithCsvWithNamesLoadFormat(t *testing.T) {
+	t.Log("stream load a csv file to Doris")
+
+	feNodes := os.Getenv("FE_NODES")
+	beNodes := os.Getenv("BE_NODES")
+	username := os.Getenv("USERNAME")
+	password := os.Getenv("PASSWORD")
+
+	ld, err := loader.NewStreamLoader(
+		strings.Split(feNodes, ","),
+		"my_db",
+		"users",
+		loader.WithBeNodes(strings.Split(beNodes, ",")),
+		loader.WithUsername(username),
+		loader.WithPassword(password),
+		loader.WithLoadFormat(loadformat.CsvWithNames),
+	)
+	if err != nil {
+		t.FailNow()
+		return
+	}
+
+	temp, err := os.CreateTemp("", "test_stream_load_csv_with_names_*")
+	if err != nil {
+		t.FailNow()
+		return
+	}
+	defer os.Remove(temp.Name())
+	defer temp.Close()
+
+	lines := []string{
+		`name, age`,
+		`Jenny Wong,50`,
+	}
+	for _, line := range lines {
+		_, err = temp.WriteString(line + "\n")
+		if err != nil {
+			t.FailNow()
+			return
+		}
+	}
+
+	result, err := ld.LoadFile(context.Background(), temp.Name())
+	if err != nil {
+		t.Logf("stream load error: %s", err.Error())
+		t.FailNow()
+		return
+	}
+
+	if !result.IsSuccess() {
+		t.Logf("error_url=%s message=%s", result.ErrorURL, result.Message)
+		assert.True(t, result.IsSuccess())
+	}
+
+	resultStr, _ := json.MarshalIndent(result, "", "  ")
+	t.Log(string(resultStr))
 }

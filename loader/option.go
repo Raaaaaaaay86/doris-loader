@@ -2,6 +2,7 @@ package loader
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/raaaaaaaay86/doris-loader/enum"
 	"github.com/raaaaaaaay86/doris-loader/enum/loadformat"
@@ -24,6 +25,12 @@ func WithLoadFormat(format loadformat.Enum) StreamLoaderOption {
 		case loadformat.InlineJson:
 			loader.Header["format"] = "json"
 			loader.Header["read_json_by_line"] = true
+		case loadformat.Csv:
+			loader.Header["format"] = "csv"
+			loader.Header["column_separator"] = ","
+		case loadformat.CsvWithNames:
+			loader.Header["format"] = "csv_with_names"
+			loader.Header["column_separator"] = ","
 		default:
 			if enum.IsZero(format) {
 				return fmt.Errorf("provided load format is zero value")
@@ -108,6 +115,19 @@ func WithBeNodes(beNodes []string) StreamLoaderOption {
 		}
 
 		loader.BeNodes = beNodes
+
+		return nil
+	}
+}
+
+// WithColumns sets the columns name of CSV file. It'll return an error if there has any columns set before.
+func WithColumns(columns []string) StreamLoaderOption {
+	return func(loader *StreamLoader) error {
+		if _, ok := loader.Header["columns"]; ok {
+			return fmt.Errorf("ambiguous columns. There has columns already set")
+		}
+
+		loader.Header["columns"] = strings.Join(columns, ",")
 
 		return nil
 	}

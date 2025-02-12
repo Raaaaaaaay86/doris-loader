@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/raaaaaaaay86/doris-loader/enum/loadformat"
 	"github.com/raaaaaaaay86/doris-loader/enum/protocol"
@@ -200,6 +201,83 @@ func TestNewStreamLoader(t *testing.T) {
 			},
 		},
 		{
+			TestDescription: "should prevent ambiguous backend nodes option",
+			FeNodes:         []string{"127.0.0.1:8030"},
+			Database:        "my_database",
+			Table:           "my_table",
+			Options: []loader.StreamLoaderOption{
+				loader.WithBeNodes([]string{"127.0.0.1:8040"}),
+				loader.WithBeNodes([]string{"127.0.0.1:8041"}),
+			},
+			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
+				assert.Error(t, err)
+				assert.NotNil(t, ld)
+				assert.EqualError(t, err, "ambiguous backend nodes. there has already backend nodes set")
+			},
+		},
+		{
+			TestDescription: "should prevent ambiguous max retry option",
+			FeNodes:         []string{"127.0.0.1:8030"},
+			Database:        "my_database",
+			Table:           "my_table",
+			Options: []loader.StreamLoaderOption{
+				loader.WithMaxRetry(4),
+				loader.WithMaxRetry(5),
+			},
+			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
+				assert.Error(t, err)
+				assert.NotNil(t, ld)
+				assert.EqualError(t, err, "ambiguous max retry. there is already a max retry set")
+			},
+		},
+		{
+			TestDescription: "let user set same max try option twice, if the value is the same",
+			FeNodes:         []string{"127.0.0.1:8030"},
+			Database:        "my_database",
+			Table:           "my_table",
+			Options: []loader.StreamLoaderOption{
+				loader.WithMaxRetry(4),
+				loader.WithMaxRetry(4),
+			},
+			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
+				assert.NoError(t, err)
+				assert.NotNil(t, ld)
+
+				assert.Equal(t, 4, ld.MaxRetry)
+			},
+		},
+		{
+			TestDescription: "should prevent ambiguous retry interval option",
+			FeNodes:         []string{"127.0.0.1:8030"},
+			Database:        "my_database",
+			Table:           "my_table",
+			Options: []loader.StreamLoaderOption{
+				loader.WithRetryInterval(4 * time.Second),
+				loader.WithRetryInterval(5 * time.Second),
+			},
+			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
+				assert.Error(t, err)
+				assert.NotNil(t, ld)
+				assert.EqualError(t, err, "ambiguous retry interval. there is already a retry interval set")
+			},
+		},
+		{
+			TestDescription: "let user set same max try option twice, if the value is the same",
+			FeNodes:         []string{"127.0.0.1:8030"},
+			Database:        "my_database",
+			Table:           "my_table",
+			Options: []loader.StreamLoaderOption{
+				loader.WithRetryInterval(4 * time.Second),
+				loader.WithRetryInterval(4 * time.Second),
+			},
+			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
+				assert.NoError(t, err)
+				assert.NotNil(t, ld)
+				assert.Equal(t, 4*time.Second, ld.RetryInterval)
+			},
+		},
+
+		{
 			TestDescription: "should prevent empty protocol option",
 			FeNodes:         []string{"127.0.0.1:8030"},
 			Database:        "my_database",
@@ -268,10 +346,10 @@ func TestNewStreamLoader(t *testing.T) {
 func TestStreamLoad(t *testing.T) {
 	t.Log("stream load a file to Doris")
 
-	feNodes := os.Getenv("FE_NODES")
-	beNodes := os.Getenv("BE_NODES")
-	username := os.Getenv("USERNAME")
-	password := os.Getenv("PASSWORD")
+	feNodes := "127.0.0.1:8030"
+	beNodes := "127.0.0.1:8040"
+	username := "root"
+	password := ""
 
 	ld, err := loader.NewStreamLoader(
 		strings.Split(feNodes, ","),
@@ -321,10 +399,10 @@ func TestStreamLoad(t *testing.T) {
 func TestStreamLoadWithCsvLoadFormat(t *testing.T) {
 	t.Log("stream load a csv file to Doris")
 
-	feNodes := os.Getenv("FE_NODES")
-	beNodes := os.Getenv("BE_NODES")
-	username := os.Getenv("USERNAME")
-	password := os.Getenv("PASSWORD")
+	feNodes := "127.0.0.1:8030"
+	beNodes := "127.0.0.1:8040"
+	username := "root"
+	password := ""
 
 	ld, err := loader.NewStreamLoader(
 		strings.Split(feNodes, ","),
@@ -378,10 +456,10 @@ func TestStreamLoadWithCsvLoadFormat(t *testing.T) {
 func TestStreamLoadWithCsvWithNamesLoadFormat(t *testing.T) {
 	t.Log("stream load a csv file to Doris")
 
-	feNodes := os.Getenv("FE_NODES")
-	beNodes := os.Getenv("BE_NODES")
-	username := os.Getenv("USERNAME")
-	password := os.Getenv("PASSWORD")
+	feNodes := "127.0.0.1:8030"
+	beNodes := "127.0.0.1:8040"
+	username := "root"
+	password := ""
 
 	ld, err := loader.NewStreamLoader(
 		strings.Split(feNodes, ","),

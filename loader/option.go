@@ -1,6 +1,7 @@
 package loader
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -112,7 +113,7 @@ func WithPassword(password string) StreamLoaderOption {
 func WithBeNodes(beNodes []string) StreamLoaderOption {
 	return func(loader *StreamLoader) error {
 		if len(loader.BeNodes) != 0 {
-			return fmt.Errorf("ambiguous backend nodes. there is already a list of backend nodes set")
+			return fmt.Errorf("ambiguous backend nodes. there has already backend nodes set")
 		}
 
 		loader.BeNodes = beNodes
@@ -137,7 +138,7 @@ func WithColumns(columns []string) StreamLoaderOption {
 // WithMaxRetry sets the maximum retry count for stream load. It'll return an error if there has any max retry set before.
 func WithMaxRetry(retry int) StreamLoaderOption {
 	return func(loader *StreamLoader) error {
-		if loader.MaxRetry != 3 { // 3 is the default value
+		if loader.MaxRetry != 3 && loader.MaxRetry != retry { // 3 is the default value
 			return fmt.Errorf("ambiguous max retry. there is already a max retry set")
 		}
 
@@ -151,7 +152,7 @@ func WithMaxRetry(retry int) StreamLoaderOption {
 func WithRetryInterval(interval time.Duration) StreamLoaderOption {
 	return func(loader *StreamLoader) error {
 		if loader.RetryInterval != 1*time.Second { // 1 second is the default value
-			return fmt.Errorf("ambiguous retry interval. there is already a retry interval set")
+			return errors.New("ambiguous retry interval. there is already a retry interval set")
 		}
 
 		loader.RetryInterval = interval

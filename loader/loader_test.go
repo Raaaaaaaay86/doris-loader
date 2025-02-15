@@ -316,7 +316,7 @@ func TestNewStreamLoader(t *testing.T) {
 			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
 				assert.Error(t, err)
 				assert.NotNil(t, ld)
-				assert.EqualError(t, err, loader.ErrZeroValueOption("Protocol").Error())
+				assert.EqualError(t, err, loader.ErrUnsupportedValue("invalid_protocol").Error())
 			},
 		},
 		{

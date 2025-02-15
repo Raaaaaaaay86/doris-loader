@@ -14,4 +14,7 @@ var (
 	ErrUnsupportedValue = func(value any) error {
 		return fmt.Errorf("unsupported value: %v", value)
 	}
+	ErrMissingRequiredValue = func(value any) error {
+		return fmt.Errorf("missing required value: %v", value)
+	}
 )

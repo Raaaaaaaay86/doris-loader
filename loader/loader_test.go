@@ -98,7 +98,7 @@ func TestNewStreamLoader(t *testing.T) {
 			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
 				assert.Error(t, err)
 				assert.NotNil(t, ld)
-				assert.EqualError(t, err, "frontend nodes are required")
+				assert.EqualError(t, err, loader.ErrMissingRequiredValue("FeNodes").Error())
 			},
 		},
 		{
@@ -110,7 +110,7 @@ func TestNewStreamLoader(t *testing.T) {
 			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
 				assert.Error(t, err)
 				assert.NotNil(t, ld)
-				assert.EqualError(t, err, "database is required")
+				assert.EqualError(t, err, loader.ErrMissingRequiredValue("Database").Error())
 			},
 		},
 		{
@@ -122,7 +122,7 @@ func TestNewStreamLoader(t *testing.T) {
 			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
 				assert.Error(t, err)
 				assert.NotNil(t, ld)
-				assert.EqualError(t, err, "table is required")
+				assert.EqualError(t, err, loader.ErrMissingRequiredValue("Table").Error())
 			},
 		},
 		{

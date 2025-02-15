@@ -143,15 +143,15 @@ func (s StreamLoader) LoadFile(
 // checkRequiredFields checks if required fields are set.
 func (s StreamLoader) checkRequiredFields() error {
 	if len(s.FeNodes) == 0 {
-		return fmt.Errorf("frontend nodes are required")
+		return ErrMissingRequiredValue("FeNodes")
 	}
 
 	if s.Database == "" {
-		return fmt.Errorf("database is required")
+		return ErrMissingRequiredValue("Database")
 	}
 
 	if s.Table == "" {
-		return fmt.Errorf("table is required")
+		return ErrMissingRequiredValue("Table")
 	}
 
 	return nil

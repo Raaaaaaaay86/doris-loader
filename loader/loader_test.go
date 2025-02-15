@@ -353,7 +353,7 @@ func TestStreamLoad(t *testing.T) {
 
 	ld, err := loader.NewStreamLoader(
 		strings.Split(feNodes, ","),
-		"my_db",
+		"test_db",
 		"users",
 		loader.WithBeNodes(strings.Split(beNodes, ",")),
 		loader.WithUsername(username),
@@ -406,7 +406,7 @@ func TestStreamLoadWithCsvLoadFormat(t *testing.T) {
 
 	ld, err := loader.NewStreamLoader(
 		strings.Split(feNodes, ","),
-		"my_db",
+		"test_db",
 		"users",
 		loader.WithBeNodes(strings.Split(beNodes, ",")),
 		loader.WithUsername(username),
@@ -463,7 +463,7 @@ func TestStreamLoadWithCsvWithNamesLoadFormat(t *testing.T) {
 
 	ld, err := loader.NewStreamLoader(
 		strings.Split(feNodes, ","),
-		"my_db",
+		"test_db",
 		"users",
 		loader.WithBeNodes(strings.Split(beNodes, ",")),
 		loader.WithUsername(username),

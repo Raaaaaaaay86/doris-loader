@@ -316,7 +316,7 @@ func TestNewStreamLoader(t *testing.T) {
 			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
 				assert.Error(t, err)
 				assert.NotNil(t, ld)
-				assert.EqualError(t, err, loader.ErrUnsupportedValue("invalid_protocol").Error())
+				assert.EqualError(t, err, loader.ErrUnsupportValue("invalid_protocol").Error())
 			},
 		},
 		{
@@ -330,7 +330,7 @@ func TestNewStreamLoader(t *testing.T) {
 			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
 				assert.Error(t, err)
 				assert.NotNil(t, ld)
-				assert.EqualError(t, err, loader.ErrUnsupportedValue("invalid_load_format").Error())
+				assert.EqualError(t, err, loader.ErrUnsupportValue("invalid_load_format").Error())
 			},
 		},
 	}

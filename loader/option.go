@@ -36,7 +36,7 @@ func WithLoadFormat(format loadformat.Enum) StreamLoaderOption {
 				return ErrZeroValueOption("LoadFormat")
 			}
 
-			return ErrUnsupportedValue(format)
+			return ErrUnsupportValue(format)
 		}
 
 		return nil
@@ -58,7 +58,7 @@ func WithProtocol(p protocol.Enum) StreamLoaderOption {
 				return ErrZeroValueOption("Protocol")
 			}
 
-			return ErrUnsupportedValue(p)
+			return ErrUnsupportValue(p)
 		}
 
 		return nil

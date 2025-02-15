@@ -11,7 +11,7 @@ var (
 	ErrZeroValueOption = func(field string) error {
 		return fmt.Errorf("option is zero value: %s", field)
 	}
-	ErrUnsupportedValue = func(value any) error {
+	ErrUnsupportValue = func(value any) error {
 		return fmt.Errorf("unsupported value: %v", value)
 	}
 	ErrMissingRequiredValue = func(value any) error {

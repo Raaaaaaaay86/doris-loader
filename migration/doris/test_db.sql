@@ -1,0 +1,11 @@
+CREATE DATABASE IF NOT EXISTS `test_db`;
+
+USE `test_db`;
+
+CREATE TABLE IF NOT EXISTS users
+(
+    `name` VARCHAR(50),
+    `age` INT
+)
+DUPLICATE KEY(`name`)
+DISTRIBUTED BY HASH(`name`) BUCKETS AUTO;

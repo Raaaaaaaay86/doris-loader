@@ -149,7 +149,7 @@ func WithMaxRetry(retry int) StreamLoaderOption {
 // WithRetryInterval sets the retry interval for stream load. It'll return an error if there has any retry interval set before.
 func WithRetryInterval(interval time.Duration) StreamLoaderOption {
 	return func(loader *StreamLoader) error {
-		if loader.RetryInterval != 1*time.Second { // 1 second is the default value
+		if loader.RetryInterval != 1*time.Second && loader.RetryInterval != interval { // 1 second is the default value
 			return ErrAmbiguousOption("RetryInterval")
 		}
 

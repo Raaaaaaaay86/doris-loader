@@ -137,7 +137,7 @@ func TestNewStreamLoader(t *testing.T) {
 			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
 				assert.Error(t, err)
 				assert.NotNil(t, ld)
-				assert.EqualError(t, err, loader.ErrAmbiguousOption("username").Error())
+				assert.EqualError(t, err, loader.ErrAmbiguousOption("Username").Error())
 			},
 		},
 		{

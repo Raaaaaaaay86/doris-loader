@@ -1,0 +1,85 @@
+version: v3
+
+services:
+  doris-fe1:
+    image: selectdb/doris.fe-ubuntu:2.1.6
+    networks:
+      doris_network:
+        ipv4_address: 175.27.0.9
+    environment:
+      - FE_ID=1
+      - FE_SERVERS=fe1:175.27.0.9:9010
+    volumes:
+      - doris_fe1_data:/opt/apache-doris
+    ports:
+      - 8030:8030
+      - 9030:9030
+      - 9090:9090
+
+  doris-be1:
+    image: selectdb/doris.be-ubuntu:2.1.6
+    privileged: true
+    command: sysctl -w vm.max_map_count=2000000
+    networks:
+      doris_network:
+        ipv4_address: 175.27.0.10
+    environment:
+      - FE_SERVERS=fe1:175.27.0.9:9010
+      - BE_ADDR=175.27.0.10:9050
+    volumes:
+      - doris_be1_data:/opt/apache-doris
+    depends_on:
+      - doris-fe1
+    ports:
+      - 9051:9050
+      - 8040:8040
+
+  doris-be2:
+    image: selectdb/doris.be-ubuntu:2.1.6
+    privileged: true
+    command: sysctl -w vm.max_map_count=2000000
+    networks:
+      doris_network:
+        ipv4_address: 175.27.0.11
+    environment:
+      - FE_SERVERS=fe1:175.27.0.9:9010
+      - BE_ADDR=175.27.0.11:9050
+    volumes:
+      - doris_be2_data:/opt/apache-doris
+    depends_on:
+      - doris-fe1
+    ports:
+      - 9052:9050
+      - 8041:8040
+
+  doris-be3:
+    image: selectdb/doris.be-ubuntu:2.1.6
+    privileged: true
+    command: sysctl -w vm.max_map_count=2000000
+    networks:
+      doris_network:
+        ipv4_address: 175.27.0.12
+    environment:
+      - FE_SERVERS=fe1:175.27.0.9:9010
+      - BE_ADDR=175.27.0.12:9050
+    # volumes:
+    #   - doris_be3_data:/opt/apache-doris
+    depends_on:
+      - doris-fe1
+    ports:
+      - 9053:9050
+      - 8042:8040
+
+networks:
+  doris_network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 175.27.0.0/24
+
+volumes:
+  doris_fe1_data:
+  doris_be1_data:
+  doris_be2_data:
+  doris_be3_data:

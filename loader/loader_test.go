@@ -364,26 +364,7 @@ func TestStreamLoad(t *testing.T) {
 		return
 	}
 
-	temp, err := os.CreateTemp("", "test_stream_load_*")
-	if err != nil {
-		t.FailNow()
-		return
-	}
-	defer os.Remove(temp.Name())
-	defer temp.Close()
-
-	lines := []string{
-		`{"name": "John Doe", "age": 30}`,
-	}
-	for _, line := range lines {
-		_, err = temp.WriteString(line + "\n")
-		if err != nil {
-			t.FailNow()
-			return
-		}
-	}
-
-	result, err := ld.LoadFile(context.Background(), temp.Name())
+	result, err := ld.LoadFile(context.Background(), "../manifest/test/users.json")
 	if err != nil {
 		t.Logf("stream load error: %s", err.Error())
 		t.FailNow()
@@ -419,26 +400,7 @@ func TestStreamLoadWithCsvLoadFormat(t *testing.T) {
 		return
 	}
 
-	temp, err := os.CreateTemp("", "test_stream_load_csv_*")
-	if err != nil {
-		t.FailNow()
-		return
-	}
-	defer os.Remove(temp.Name())
-	defer temp.Close()
-
-	lines := []string{
-		`Jenny Chang,50`,
-	}
-	for _, line := range lines {
-		_, err = temp.WriteString(line + "\n")
-		if err != nil {
-			t.FailNow()
-			return
-		}
-	}
-
-	result, err := ld.LoadFile(context.Background(), temp.Name())
+	result, err := ld.LoadFile(context.Background(), "../manifest/test/users_no_header.csv")
 	if err != nil {
 		t.Logf("stream load error: %s", err.Error())
 		t.FailNow()
@@ -475,27 +437,7 @@ func TestStreamLoadWithCsvWithNamesLoadFormat(t *testing.T) {
 		return
 	}
 
-	temp, err := os.CreateTemp("", "test_stream_load_csv_with_names_*")
-	if err != nil {
-		t.FailNow()
-		return
-	}
-	defer os.Remove(temp.Name())
-	defer temp.Close()
-
-	lines := []string{
-		`name, age`,
-		`Jenny Wong,50`,
-	}
-	for _, line := range lines {
-		_, err = temp.WriteString(line + "\n")
-		if err != nil {
-			t.FailNow()
-			return
-		}
-	}
-
-	result, err := ld.LoadFile(context.Background(), temp.Name())
+	result, err := ld.LoadFile(context.Background(), "../manifest/test/users_with_header.csv")
 	if err != nil {
 		t.Logf("stream load error: %s", err.Error())
 		t.FailNow()

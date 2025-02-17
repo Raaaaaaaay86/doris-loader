@@ -170,6 +170,7 @@ func WithLabel(label string) StreamLoaderOption {
 	}
 }
 
+// WithColumnSeparator sets the column separator for CSV file. It'll return an error if there has any column separator set before.
 func WithColumnSeparator(separator string) StreamLoaderOption {
 	return func(loader *StreamLoader) error {
 		if oldSeparator, ok := loader.Header["column_separator"]; ok && oldSeparator != separator {

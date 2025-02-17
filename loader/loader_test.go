@@ -3,6 +3,7 @@ package loader_test
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -231,6 +232,21 @@ func TestNewStreamLoader(t *testing.T) {
 			},
 		},
 		{
+			TestDescription: "should prevent ambiguous label option",
+			FeNodes:         []string{"127.0.0.1:8030"},
+			Database:        "my_database",
+			Table:           "my_table",
+			Options: []loader.StreamLoaderOption{
+				loader.WithLabel("label_a"),
+				loader.WithLabel("label_b"),
+			},
+			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
+				assert.Error(t, err)
+				assert.NotNil(t, ld)
+				assert.EqualError(t, err, loader.ErrAmbiguousOption("Label").Error())
+			},
+		},
+		{
 			TestDescription: "let user set same max try option twice, if the value is the same",
 			FeNodes:         []string{"127.0.0.1:8030"},
 			Database:        "my_database",
@@ -451,4 +467,55 @@ func TestStreamLoadWithCsvWithNamesLoadFormat(t *testing.T) {
 
 	resultStr, _ := json.MarshalIndent(result, "", "  ")
 	t.Log(string(resultStr))
+}
+
+func TestStreamLoadCannotLoadBySameLabelTwice(t *testing.T) {
+	t.Log("stream load a csv file to Doris with same label twice")
+
+	feNodes := "127.0.0.1:8030"
+	beNodes := "127.0.0.1:8040"
+	username := "root"
+	password := os.Getenv("PASSWORD")
+
+	ld, err := loader.NewStreamLoader(
+		strings.Split(feNodes, ","),
+		"test_db",
+		"users",
+		loader.WithBeNodes(strings.Split(beNodes, ",")),
+		loader.WithUsername(username),
+		loader.WithPassword(password),
+		loader.WithLoadFormat(loadformat.CsvWithNames),
+		loader.WithLabel(fmt.Sprintf("label_%d", time.Now().Unix())),
+	)
+	if err != nil {
+		t.FailNow()
+		return
+	}
+
+	result, err := ld.LoadFile(context.Background(), "../manifest/test/users_no_header.csv")
+	if err != nil {
+		t.Logf("stream load error: %s", err.Error())
+		t.FailNow()
+		return
+	}
+
+	resultStr, _ := json.MarshalIndent(result, "", "  ")
+	t.Log(string(resultStr))
+
+	if !result.IsSuccess() {
+		t.Logf("error_url=%s message=%s", result.ErrorURL, result.Message)
+		assert.True(t, result.IsSuccess())
+	}
+
+	result, err = ld.LoadFile(context.Background(), "../manifest/test/users_no_header.csv")
+	if err != nil {
+		t.Logf("stream load error: %s", err.Error())
+		t.FailNow()
+		return
+	}
+
+	resultStr, _ = json.MarshalIndent(result, "", "  ")
+	t.Log(string(resultStr))
+
+	assert.False(t, result.IsSuccess())
 }

@@ -158,3 +158,15 @@ func WithRetryInterval(interval time.Duration) StreamLoaderOption {
 		return nil
 	}
 }
+
+func WithLabel(label string) StreamLoaderOption {
+	return func(loader *StreamLoader) error {
+		if oldLabel, ok := loader.Header["label"]; ok && oldLabel != label {
+			return ErrAmbiguousOption("Label")
+		}
+
+		loader.Header["label"] = label
+
+		return nil
+	}
+}

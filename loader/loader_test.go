@@ -410,6 +410,7 @@ func TestStreamLoadWithCsvLoadFormat(t *testing.T) {
 		loader.WithPassword(password),
 		loader.WithLoadFormat(loadformat.Csv),
 		loader.WithColumns([]string{"name", "age"}),
+		loader.WithColumnSeparator(","),
 	)
 	if err != nil {
 		t.FailNow()
@@ -447,6 +448,7 @@ func TestStreamLoadWithCsvWithNamesLoadFormat(t *testing.T) {
 		loader.WithUsername(username),
 		loader.WithPassword(password),
 		loader.WithLoadFormat(loadformat.CsvWithNames),
+		loader.WithColumnSeparator(","),
 	)
 	if err != nil {
 		t.FailNow()
@@ -485,6 +487,7 @@ func TestStreamLoadCannotLoadBySameLabelTwice(t *testing.T) {
 		loader.WithUsername(username),
 		loader.WithPassword(password),
 		loader.WithLoadFormat(loadformat.CsvWithNames),
+		loader.WithColumnSeparator(","),
 		loader.WithLabel(fmt.Sprintf("label_%d", time.Now().Unix())),
 	)
 	if err != nil {
@@ -518,4 +521,43 @@ func TestStreamLoadCannotLoadBySameLabelTwice(t *testing.T) {
 	t.Log(string(resultStr))
 
 	assert.False(t, result.IsSuccess())
+}
+
+func TestStreamLoadWithCustomColumnSeparator(t *testing.T) {
+	t.Log("stream load a csv file to Doris with custom column separator")
+
+	feNodes := os.Getenv("FE_NODES")
+	beNodes := os.Getenv("BE_NODES")
+	username := os.Getenv("USERNAME")
+	password := os.Getenv("PASSWORD")
+
+	ld, err := loader.NewStreamLoader(
+		strings.Split(feNodes, ","),
+		"test_db",
+		"users",
+		loader.WithBeNodes(strings.Split(beNodes, ",")),
+		loader.WithUsername(username),
+		loader.WithPassword(password),
+		loader.WithLoadFormat(loadformat.Csv),
+		loader.WithColumnSeparator("|"),
+	)
+	if err != nil {
+		t.FailNow()
+		return
+	}
+
+	result, err := ld.LoadFile(context.Background(), "../manifest/test/users_pipe_separator.csv")
+	if err != nil {
+		t.Logf("stream load error: %s", err.Error())
+		t.FailNow()
+		return
+	}
+
+	resultStr, _ := json.MarshalIndent(result, "", "  ")
+	t.Log(string(resultStr))
+
+	if !result.IsSuccess() {
+		t.Logf("error_url=%s message=%s", result.ErrorURL, result.Message)
+		assert.True(t, result.IsSuccess())
+	}
 }

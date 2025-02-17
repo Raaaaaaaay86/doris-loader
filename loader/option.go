@@ -27,10 +27,8 @@ func WithLoadFormat(format loadformat.Enum) StreamLoaderOption {
 			loader.Header["read_json_by_line"] = true
 		case loadformat.Csv:
 			loader.Header["format"] = "csv"
-			loader.Header["column_separator"] = ","
 		case loadformat.CsvWithNames:
 			loader.Header["format"] = "csv_with_names"
-			loader.Header["column_separator"] = ","
 		default:
 			if enum.IsZero(format) {
 				return ErrZeroValueOption("LoadFormat")
@@ -167,6 +165,18 @@ func WithLabel(label string) StreamLoaderOption {
 		}
 
 		loader.Header["label"] = label
+
+		return nil
+	}
+}
+
+func WithColumnSeparator(separator string) StreamLoaderOption {
+	return func(loader *StreamLoader) error {
+		if oldSeparator, ok := loader.Header["column_separator"]; ok && oldSeparator != separator {
+			return ErrAmbiguousOption("ColumnSeparator")
+		}
+
+		loader.Header["column_separator"] = separator
 
 		return nil
 	}

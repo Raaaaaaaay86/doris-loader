@@ -182,3 +182,20 @@ func WithColumnSeparator(separator string) StreamLoaderOption {
 		return nil
 	}
 }
+
+// The ratio range is [0, 1], 0 means 0% data should not have any error, 1 means 100% data should not have any error. It'll return an error if there has any max filter ratio set before.
+func WithMaxFilterRatio(ratio float64) StreamLoaderOption {
+	return func(loader *StreamLoader) error {
+		if ratio < 0 || ratio > 1 {
+			return ErrUnsupportValue("MaxFilterRatio")
+		}
+
+		if oldRatio, ok := loader.Header["max_filter_ratio"]; ok && oldRatio != ratio {
+			return ErrAmbiguousOption("MaxFilterRatio")
+		}
+
+		loader.Header["max_filter_ratio"] = ratio
+
+		return nil
+	}
+}

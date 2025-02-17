@@ -247,6 +247,21 @@ func TestNewStreamLoader(t *testing.T) {
 			},
 		},
 		{
+			TestDescription: "should prevent ambiguous max filter ration option",
+			FeNodes:         []string{"127.0.0.1:8030"},
+			Database:        "my_database",
+			Table:           "my_table",
+			Options: []loader.StreamLoaderOption{
+				loader.WithMaxFilterRatio(0.1),
+				loader.WithMaxFilterRatio(0.2),
+			},
+			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
+				assert.Error(t, err)
+				assert.NotNil(t, ld)
+				assert.EqualError(t, err, loader.ErrAmbiguousOption("MaxFilterRatio").Error())
+			},
+		},
+		{
 			TestDescription: "let user set same max try option twice, if the value is the same",
 			FeNodes:         []string{"127.0.0.1:8030"},
 			Database:        "my_database",
@@ -347,6 +362,34 @@ func TestNewStreamLoader(t *testing.T) {
 				assert.Error(t, err)
 				assert.NotNil(t, ld)
 				assert.EqualError(t, err, loader.ErrUnsupportValue("invalid_load_format").Error())
+			},
+		},
+		{
+			TestDescription: "max filter ratio (0 <= value <= 1)",
+			FeNodes:         []string{"127.0.0.1:8030"},
+			Database:        "my_database",
+			Table:           "my_table",
+			Options: []loader.StreamLoaderOption{
+				loader.WithMaxFilterRatio(-0.2),
+			},
+			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
+				assert.Error(t, err)
+				assert.NotNil(t, ld)
+				assert.EqualError(t, err, loader.ErrUnsupportValue("MaxFilterRatio").Error())
+			},
+		},
+		{
+			TestDescription: "max filter ratio (0 <= value <= 1)",
+			FeNodes:         []string{"127.0.0.1:8030"},
+			Database:        "my_database",
+			Table:           "my_table",
+			Options: []loader.StreamLoaderOption{
+				loader.WithMaxFilterRatio(1.1),
+			},
+			ExpectFunc: func(tc testcase, ld *loader.StreamLoader, err error) {
+				assert.Error(t, err)
+				assert.NotNil(t, ld)
+				assert.EqualError(t, err, loader.ErrUnsupportValue("MaxFilterRatio").Error())
 			},
 		},
 	}
@@ -555,6 +598,73 @@ func TestStreamLoadWithCustomColumnSeparator(t *testing.T) {
 
 	resultStr, _ := json.MarshalIndent(result, "", "  ")
 	t.Log(string(resultStr))
+
+	if !result.IsSuccess() {
+		t.Logf("error_url=%s message=%s", result.ErrorURL, result.Message)
+		assert.True(t, result.IsSuccess())
+	}
+}
+
+func TestStreamLoadWithStrictMaxFilterRatio(t *testing.T) {
+	t.Log("stream load a file to Doris with max filter ratio")
+
+	feNodes := "127.0.0.1:8030"
+	beNodes := "127.0.0.1:8040"
+	username := "root"
+	password := os.Getenv("PASSWORD")
+
+	ld, err := loader.NewStreamLoader(
+		strings.Split(feNodes, ","),
+		"test_db",
+		"users",
+		loader.WithBeNodes(strings.Split(beNodes, ",")),
+		loader.WithUsername(username),
+		loader.WithPassword(password),
+		loader.WithMaxFilterRatio(0), // 0 means cannot have any error row in file
+	)
+	if err != nil {
+		t.FailNow()
+		return
+	}
+
+	result, err := ld.LoadFile(context.Background(), "../manifest/test/users_wrong_data.json")
+	if err != nil {
+		t.Logf("stream load error: %s", err.Error())
+		t.FailNow()
+		return
+	}
+
+	assert.False(t, result.IsSuccess())
+}
+
+func TestStreamLoadWithLooseMaxFilterRatio(t *testing.T) {
+	t.Log("stream load a file to Doris with max filter ratio")
+
+	feNodes := os.Getenv("FE_NODES")
+	beNodes := os.Getenv("BE_NODES")
+	username := os.Getenv("USERNAME")
+	password := os.Getenv("PASSWORD")
+
+	ld, err := loader.NewStreamLoader(
+		strings.Split(feNodes, ","),
+		"test_db",
+		"users",
+		loader.WithBeNodes(strings.Split(beNodes, ",")),
+		loader.WithUsername(username),
+		loader.WithPassword(password),
+		loader.WithMaxFilterRatio(1), // 1 means ignore every error rows in file
+	)
+	if err != nil {
+		t.FailNow()
+		return
+	}
+
+	result, err := ld.LoadFile(context.Background(), "../manifest/test/users_wrong_data.json")
+	if err != nil {
+		t.Logf("stream load error: %s", err.Error())
+		t.FailNow()
+		return
+	}
 
 	if !result.IsSuccess() {
 		t.Logf("error_url=%s message=%s", result.ErrorURL, result.Message)

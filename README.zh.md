@@ -29,3 +29,37 @@ if err != nil {
 result, err := ld.LoadFile(context.Background(), "path/to/file")
 // skip...
 ```
+`doris-loader`使用`InlineJson`作為預設載入格式，你可以使用`WithLoadFormat`來更改載入格式。
+
+```go
+ld, err := loader.NewStreamLoader(
+  []string{"127.0.0.1:8030"},
+  "database_name",
+  "table_name",
+  loader.WithUsername(username),
+  loader.WithPassword(password),
+  loader.WithLoadFormat(loader.Csv),
+  loader.WithColumnSeparator(","),
+  loader.WithColumns([]string{"col1", "col2", "col3"}),
+)
+if err != nil {
+  return err
+}
+```
+如果你想要使用csv格式載入資料，你應該指定`WithLoadFormat(Csv)`和`WithColumnSeparator`來設定欄位分隔符號，如果欄位分隔符號不是`\t`。最後需要使用`WithColumns`來指定對應於csv欄位的欄位名稱。
+
+```go
+ld, err := loader.NewStreamLoader(
+  []string{"127.0.0.1:8030"},
+  "database_name",
+  "table_name",
+  loader.WithUsername(username),
+  loader.WithPassword(password),
+  loader.WithLoadFormat(loader.CsvWithNames),
+  loader.WithColumnSeparator(","),
+)
+if err != nil {
+  return err
+}
+```
+如果你想要使用csv格式載入資料並且首行為欄位名稱，你只需要指定`WithLoadFormat(CsvWithNames)`和`WithColumnSeparator`來設定欄位分隔符號，如果欄位分隔符號不是`\t`。

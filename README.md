@@ -28,3 +28,37 @@ if err != nil {
 result, err := ld.LoadFile(context.Background(), "path/to/file")
 // skip...
 ```
+`doris-loader` use `InlineJson` as default load format, you can change it by using `WithLoadFormat`.
+
+```go
+ld, err := loader.NewStreamLoader(
+  []string{"127.0.0.1:8030"},
+  "database_name",
+  "table_name",
+  loader.WithUsername(username),
+  loader.WithPassword(password),
+  loader.WithLoadFormat(loader.Csv),
+  loader.WithColumnSeparator(","),
+  loader.WithColumns([]string{"col1", "col2", "col3"}),
+)
+if err != nil {
+  return err
+}
+```
+If you want to load data by csv format, you should specify `WithLoadFormat(Csv)` and `WithColumnSeparator` to set the column separator if the column separator is not `\t`. Lastly, you should use `WithColumns` to specify the column names which correspond to the csv columns.
+
+```go
+ld, err := loader.NewStreamLoader(
+  []string{"127.0.0.1:8030"},
+  "database_name",
+  "table_name",
+  loader.WithUsername(username),
+  loader.WithPassword(password),
+  loader.WithLoadFormat(loader.CsvWithNames),
+  loader.WithColumnSeparator(","),
+)
+if err != nil {
+  return err
+}
+```
+If you want to load data by csv format with column names at first line, you should only specify `WithLoadFormat(CsvWithNames)` and `WithColumnSeparator` to set the column separator if the column separator is not `\t`.

@@ -159,6 +159,7 @@ func WithRetryInterval(interval time.Duration) StreamLoaderOption {
 	}
 }
 
+// WithLabel sets the label for stream load in order to prevent duplicate data loading. It'll return an error if there has any label set before.
 func WithLabel(label string) StreamLoaderOption {
 	return func(loader *StreamLoader) error {
 		if oldLabel, ok := loader.Header["label"]; ok && oldLabel != label {
